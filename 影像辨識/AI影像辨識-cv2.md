@@ -65,7 +65,6 @@ cv2.destroyAllWindows()
 6. 影像辨識-numpy陣列格式
     - 多維度陣列
     - x軸是axis=0，y軸是axis=1。先列數、再欄數。
-
 ```
 #指定型別
 a = np.array([[1,2,3],[4,5,6]], type=float)
