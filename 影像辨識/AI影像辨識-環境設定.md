@@ -57,25 +57,26 @@
 - py管理環境
     - 切換專案用，package之間會有版本衝突，解決open src衍生的問題。
 
-    | 功能 | 指令 |
-    | --- | --- |
-    | 列出已安裝套件 | `conda list`、`pip list`|
-    | 安裝套件 | `conda install opencv-python`、`pip install opencv-python`|
-    | 建立並進入檔案夾 | `madir case3118`，`cd case3118` |
-    | 建立VM | `conda create --name case31118 python=3.11.8` |
-    | 複製VM | `conda create --name rjsiao --clone case31118` |
-    | 刪除VM | `conda env remove --name case31118` |
-    | 啟用VM | `conda activate case31118` |
-    | 停用VM | `conda deactivate` |
-    | 列出所有環境 | `conda env list` |
-    | (VM)列出當前環境套件 | `conda info` |
-    | (VM)安裝cv2套件 [查詢pypi.org] | `pip install opencv-python==4.10.0.84` |
-    | (VM)安裝imutil套件 | `pip install imutils==0.5.4` |
-    | (VM)進入py互動模式，檢查cv2 | `python`，`>>> import cv2`，`>>> exit()` |
-    | (VM)下載套件清單 | `pip freeze > requirements.txt`|
-    | (VM)根據套件清單安裝套件 | `pip install --no-cache-dir -r requirement_rjsiao.txt`|
-    | (VM)檢查套件 | `conda list` |
-    | (VM)開啟VSCode | `code ./your_directory/ch02`|
+    | 創建新VM | 功能 | 指令 |
+    | --- | --- | --- |
+    | | 列出已安裝套件 | `conda list`、`pip list`|
+    | | 安裝套件 | `conda install opencv-python`、`pip install opencv-python`|
+    | 1 | 建立並進入檔案夾 | `madir case3118`，`cd case3118` |
+    | 1 | 建立VM | `conda create --name case31118 python=3.11.8` |
+    | | 複製VM | `conda create --name rjsiao --clone case31118` |
+    | | 刪除VM | `conda env remove --name case31118` |
+    | 2 | 啟用VM | `conda activate case31118` |
+    | | 停用VM | `conda deactivate` |
+    | 3 | 列出所有環境 | `conda env list` |
+    | 4 | (VM)列出當前環境套件 | `conda info` |
+    | 4 | (VM)安裝cv2套件 [查詢pypi.org] | `pip install opencv-python==4.10.0.84` |
+    | 4 | (VM)安裝imutil套件 | `pip install imutils==0.5.4` |
+    | 5 | (VM)進入py互動模式，檢查cv2 | `python`，`>>> import cv2`，`>>> exit()` |
+    | | (VM)下載套件清單 | `pip freeze > requirements.txt`|
+    | | (VM)根據套件清單安裝套件 | `pip install --no-cache-dir -r requirement_rjsiao.txt`|
+    | 4 | (VM)檢查套件 | `conda list` |
+    | 6 | (VM)開啟VSCode | `code ./your_directory/ch02`|
+    | | (VM)檢視cmd歷程 | `history`|
 
     - 絕對路徑 vs. 相對路徑
         - 方法1: "" 內的 `\` 要處理成 `\\`，否則會被誤認為\跳脫字元。
@@ -115,14 +116,27 @@
     - STEAM教育網 https://steam.oxxostudio.tw
     - 為你自己學PYTHON https://pythonbook.cc
 
-- AI發展
-    - 2025發展進程：LLM和語音辨識、多模態。
-
-
-
-    
-
-
-
+- AI發展歷程
+    - 發展重點
+        - 開始重視的導火線：Alpha GO (2017年)
+        - 人工智慧的濫觴：魔鏡
+        - 大數據 -> IoT -> 邊緣運算 -> AI和5G
+        - 2012年10月 Hinton 有學生用 NVIDIA 晶片製作出 16% 錯誤率，大幅降低了錯誤率。
+    - 2025發展進程：LLM和語音辨識、多模態(語言、文字、聲音的輸入)。
+        - 強人工智慧：機器已有知覺，資料驅動
+        - 弱人工智慧：機器只有推理，規則驅動
+        - 早期-專家系統 (= 窮舉法)
+        - 現代-機器學習 (= 訓練權重)
+    - 學習圖像辨識應培養(資料科學文氏圖)
+        1. 撰寫電腦程式的能力
+        2. 理解數學統計的能力-分類與回歸
+        3. 專業領域的知識
+    - Google AI資源
+        - [Teachable Machine](https://teachablemachine.withgoogle.com)
+        - [Google Quick Draw](https://quickdraw.withgoogle.com)
+    - 資料採礦：關聯、特徵
+    - 建模重點
+        - 訓練後在激活函數的導入：讓線性變曲線，透過RELU等函數。
+        - 訓練時在調整參數、權重。
 
 
