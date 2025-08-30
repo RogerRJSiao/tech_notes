@@ -22,7 +22,7 @@
 - OCR (光學字元識別)
     - 套件：[Tesseract-OCR](https://github.com/tesseract-ocr/tesseract) [ref: https://twgo.io/yebtq]
     - 安裝步驟
-        1. Windows版Tesseract-OCR 安裝程式的下載網址：https://github.com/UB-Mannheim/tesseract/wiki。
+        1. Windows版Tesseract-OCR 安裝程式的下載網址：https://github.com/UB-Mannheim/tesseract/wiki 。
         2. Tesseract-OCR預設只有英文語言包，需要自行至語言包網址：https://github.com/tesseract-ocr/tessdata_best 下載繁/簡中文語言包。
         3. 啟動安裝 tesseract-ocr-w64-setup-5.4.0.20240606.exe。
         4. 在 C:\Program Files\Tesseract-OCR\tessdata 貼上語言包檔案：
