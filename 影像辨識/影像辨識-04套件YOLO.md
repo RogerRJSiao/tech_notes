@@ -11,7 +11,8 @@
         4. 輸出層1層：產出費別用分類，或產出數值回歸
 - 發展史
     - YOLO v1 ~ v5是建構在 .NET程式下，不容易安裝部署。
-    - 台灣團隊開發YOLO v5、v7。
+    - YOLO v1 v3 要建立Linux環境
+    - 台灣團隊開發YOLO v5、v7。YOLO安裝
     - YOLO v12加入追蹤。n是nano
     - Ultralytics目前最新v13 (2025年7月)。
 
@@ -34,4 +35,40 @@
             - Precision rate 誤報 = TP / (TP + FP)
             - Recall rate 漏報 = TP / (TP + FN)
             - F1 score 調和平均數 = 2 x Precision x Recall / (Precision + Recall)
+            
+- AI建模-訓練權重(抓出特徵)
+    - 取得
+        - 從roboflow取得資料集。
+        - 來自公司內部圖集。
+        - 公開資料集。
+    - 標註
+        - labelImg：若欲公司圖檔，能保有機密性。
+            - 從Github下載：https://github.com/HumanSignal/labelImg。
+            - 到 data/predefined_classess.txt，變更標注類別名稱。
+            - 透過 `python labelImg.py` 開啟標註介面。
+            - 開啟指定圖庫的檔案夾(=目錄)，選擇YOLO格式，開始選圖並標註。
+            - 單圖標註完畢時，每張圖.jpg旁邊會多一個.txt，內存有標圖的位置座標。
+            - 準備資料集，切割資料集訓練集、驗證集(8:2)，再分類.jpg和.txt。
+            - 檢視圖檔狀況與標注狀況。
+            - 製作yaml檔案 (=對照表)。
+                ```yaml
+                train:  // 訓練集目錄
+                val:    // 驗證集目錄
+                test:   // 測試集目錄
+
+                nc:     // 類別總數 int
+                names: ['類別1名稱', '類別2名稱']   // 取自標註的 predefined_classess.txt
+                ```
+        - roboflow：需付費或公開，可能有資安風險。
+    - 訓練及驗證
+        - step 1: 確認資料集位置與yaml檔案指定位置相同。
+        - step 2+4: 下載模型，並且開始訓練
+            - 專案夾test/images、train/images、valid/images、data.yml
+            - 選擇模型尺寸、YOLO版本、訓練週期、批次大小、輸入影像長寬(只能縮小)、訓練可視化。
+                - 除了測試集、驗證集，也可以加入測試集。
+            - 過程與產出結果
+                - yolo12n.pt 是預計訓練的模型。
+                - run/detect/train/weight/best.pt 最好的模型
+                - run/detect/train/weight/last.pt 最後一次的模型
+                - 除了基本的圖，也可以把建模的資料寫入excel。
 
