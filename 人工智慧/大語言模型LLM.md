@@ -6,12 +6,14 @@
 
 ## 1. 為何要自建自用大語言模型
 
-### 1-1. 資訊查詢發展史
+### 1-1. 資訊查詢與AI發展史
 - 搜尋引擎：Google, Yahoo
 - 語音轉文字(speech-to-text) + 搜尋引擎：Apple Siri (2007), Google Assistant, Amazon Alexa, MS Cortana
 - 文字型聊天機器人(chatbot)
 - 導入LLM的應用 + UX：ChatGPT (2022)
     - OpenAI開發，2017年初次發布模型GPT (generative pre-trained transformer)，2022年提供ChatGPT服務，2024年GPT-4引入多模態。
+- 歐盟於2024年頒布並實施人工智慧法案(AI Act)：強調AI應具備可解釋(explainable)、可負責(responsible)精神。
+- 第一波AI熱潮1950年代，第二波1980年代發展出2大方向專家系統(expert system, ES)、類神經網絡(artificial neural network, ANN)。第三波興起於2010年代至今。
 
 ### 1-2. AI應用領域
 - 領域1. 電腦視覺(computer vision, CV)
@@ -19,10 +21,11 @@
 - 領域3. 資料科學(data science, DS)
 - 其他領域：推薦系統(recommender system, RS)、智慧決策支援系統(intelligent decision support system, IDSS)
 - 發展強度：窄AI/弱AI(ANI)、通用AI/強AI(AGI)、超AI(ASI)
+    - 強AI程度：(由低至高) conversational < resoning < autmomous < innnovating < organizational AI
 
 ### 1-3. 優化LLM模型表現
 - 重新訓練
-    - 概念：適用於開放模型，取得原始資料集，
+    - 概念：適用於開放模型，取得原始資料集，建構大量繁複的乘加算 + 激勵函數運算。
     - 劣勢：模型改動大，投入技術與成本高
 - 微調
     - 概念：使用預訓練模型(pre-trained model)，進行微調(fine-tuneing)
@@ -34,7 +37,28 @@
 - 檢索增強生成(retrival-augmented generation, RAG)
     - 概念：由使用者限定資料範疇，強化情境相關資訊，再讓LLM找出解答、產生文字內容。
     - 優勢：(1) 無須資料清洗、(2) 根據預算可搭配微調、RAG技術之開發。
-    - 案例：個人知識管理
+    - 案例：個人知識管理(personal knowledge management, PKM)。Deep Research 開發與應用 - OpenAI 或 Perplexity。
+- 思考鏈(chain-of-thought, CoT)
+    - 概念：避免或改善AI幻覺
+- 評估 LLM 能力測試 (四大類項 - 英文、程式、數學、中文)
+    - MMLU：57類問題範疇
+    - DROP：斷句分拆、閱讀理解
+    - IF-Eval：列舉
+    - GPQA-Diamond
+    - SimpleQA
+    - LiveCodeBench：程式
+    - Codeforces：程式
+    - SWE Verified：程式
+    - FRAMES：RAG能力
+    - AIME 2024：數學
+    - MATH-500：數學
+    - CLUEWSE：中文
+    - C-Eval：中文
+    - Gecko：文生圖
+    - DSG1k：文生圖
+    - TIFA：文生圖
+    - DrawBench：文生圖
+    - AILuminate：倫理安全
 
 ### 1-4. 硬體選擇-基礎設備
 - 比較雲端與地端架設
@@ -57,10 +81,18 @@
         - OS系統：設定 > 系統 > 系統資訊 > Windows 規格 > 版本
         - 記憶體：設定 > 系統 > 系統資訊 > 裝置規格 > RAM
         - 硬碟：本機 > 檢視 > 硬碟大小總計
+        - GPU/高筱能運算的加速晶片：設置大量硬體乘加器(multiply accumulator, MAC)，捨棄原本 3D 繪圖需要的著色器(shader)
+        - CUDA：由 NVIDIA 開發的軟體，用於搭配 GPU 加速開發 AI 模型
+
     4. 選定模型放置路徑 (合理配置 SSD 資源)
         - 預設路徑：`C:\Users\rjsiao\.ollama\model\blobs\*`
         - 變更路徑：設定 > 系統 > 系統資訊 > 進階系統設定 > 環境變數 > 新增變數 `OLLAMA_MODELS` (變數值是 `D:\MODELS`) > 重啟電腦 > 新 pull 取得的模型都改在新路徑。
         - 以 .ollama 命名，在 Linux OS 此目錄 (directory) 會隱藏，但在 Windows OS 這個檔案夾 (folder) 不隱藏。其下一層的 models\blobs 存放一個模型檔、多個附屬檔。
+    5. 其他建議作法
+        - 不建議以舊電腦執行模型，因為高階電腦才適合虛擬化
+        - 不建議以舊電腦執行模型，因為舊電腦不適合
+        - 不建議用虛擬記憶體跑 LLM，因為 SSD 頻繁切換資訊造成存取效率仍低於 RAM。
+        - 隨時留意硬體加速支援的相關設定，包括 LLM 軟體偵測硬體存在並使用，以及 NVIDIA GPU 最新支援設定
 
 ### 1-5. 軟體選擇-LLM模型
 - 模型來源：Hugging Face, GitHub, Ollama
@@ -128,11 +160,52 @@
         - Page Assist 衍生子模型【進階】
     - Open WebUI + Docker Desktop on Windows + WSL：WSL 讓 Window 系統具備與 Linux 相仿的執行環境，讓 Open WebUI 誤以為目前處於 Linux 可執行。
     - AingDesk
+        - 劣勢：(1) 僅支援簡體中文、(2) 可用瀏覽器僅中國的百度、搜狗、360搜素、(3) 以API呼叫線上LLM亦為中國公司的服務。
+    - AnythingLLM
+        - 分成不收費的桌機版、月費方案的雲端服務版。
+        - 若系統本身沒有 Ollama 函式庫，安裝過程會被詢問是否順便安裝，關乎於模型運作與是否用GPU執行。
+        - 優勢：屬於本機端的應用程式，可選擇 LLM 偏好(Ollama、LM Studio、外部 LLM 線上服務...)。
     - Jan
+        - 由 Homebrew Computer 開發
+        - 優勢：(1) 直接匯入並使用 .ggif 模型檔，(2) 可選的模型數量相當多，(3) 選取模型時預先提示記憶體與運行效率
+    - GPT4All
+        - 優勢：安裝簡易
+        - 劣勢：閃退發生在點擊icon或使用過程，比起 Ollama 可選的模型數量相當可選的模型數量相當有限
     - Chatbox AI
+        - 啟用時的指定AI模型提供者，分成Chatbox AI Cloud、API key (雲服務)、本地模型(本機端)
+        - 優劣勢-電腦版(免費)：屬於本機端的應用程式，以個人 PC 為主
+        - 優劣勢-網頁版(月費)：無法確保隱私，易受網路服務品質影響
+        - 優劣勢-手機版(免費)：安卓或蘋果皆可，或以.apk手動安裝
+    - LM Studio
+        - 優勢：易於切換用戶身分，推論時顯示當前硬體資源消耗狀態。
+        - 劣勢：支援小型RAG，文件數量5件，總容量不超過30MB。
+    - Pinokio 
+        - 安裝時出現「Windows已保護您的電腦」，點擊其他資訊 > 仍要執行。主因是該開發商尚未列於 MS 官方註冊認可的名單內。
+        - 優勢：生成內容多樣，值得一試!!!
 
 - 更新升級模型
     - 可能要同時升級 Ollama 版本，否則不支援新版模型。
     - 可能出現不可預知錯誤，特別是使用尚未正式 1.0 版。==> 在測試 PC 安裝使用，或暫不更新該模型。
+    
+### RAG - 以 Page Assist 實作為例
+- 事前作業
+    - (必要) 安裝嵌入模型
+        - Page Assist 會強烈建議在「RAG 設定」裡安裝 nomic-embeded-text。
+    - (必要) 新增知識範疇
+        - Page Assist 可支援 .pdf、.txt、.csv、.md 檔案類型。
+        - 知識新增成功的狀態：待處理 -> 處理中 -> 已完成。
+    - (非必要) 新增提示詞
+        - 可「自訂提示詞」，也可用「Copilot提示詞」讓它參考前者生成。
+- 執行推論
+    - 注意記憶體是否充足
+        - Page Assist 若顯示「記憶體不足」，關閉多餘 process，重新送出提示詞。
+- 優化表現
+    - 調整嵌入式模型細部參數
+    - 更換提示詞
+    - 更換同款模型但餐數量更多的 => 回應速度變慢
+    - 更換不同款但智慧程度更高的 => 根據需求，建立標竿測試報告，比對不同模型的輸出品質
 
-###
+### VLM - 以 Page Assist 實作為例
+- 事前作業
+    - (必要) 安裝視覺語言模型
+        - 安裝如 llava:7b 模型
