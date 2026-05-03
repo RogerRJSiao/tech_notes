@@ -4,24 +4,44 @@
 > - 閱讀日期：2026-04
 > - 資料整理：蕭瑞展
 
+> - 資料來源：Ollama 本地 AI 全方位攻略：命令列功能、五大主題測試、RAG、Vibe Coding、MCP，一本搞定所有實戰應用 (出版社：旗標 | 施威銘研究室)
+> - 閱讀日期：2026-06
+> - 資料整理：蕭瑞展
+
 ## 1. 為何要自建自用大語言模型
 
 ### 1-1. 資訊查詢與AI發展史
-- 搜尋引擎：Google, Yahoo
-- 語音轉文字(speech-to-text) + 搜尋引擎：Apple Siri (2007), Google Assistant, Amazon Alexa, MS Cortana
-- 文字型聊天機器人(chatbot)
-- 導入LLM的應用 + UX：ChatGPT (2022)
-    - OpenAI開發，2017年初次發布模型GPT (generative pre-trained transformer)，2022年提供ChatGPT服務，2024年GPT-4引入多模態。
-- 歐盟於2024年頒布並實施人工智慧法案(AI Act)：強調AI應具備可解釋(explainable)、可負責(responsible)精神。
-- 第一波AI熱潮1950年代，第二波1980年代發展出2大方向專家系統(expert system, ES)、類神經網絡(artificial neural network, ANN)。第三波興起於2010年代至今。
 
-### 1-2. AI應用領域
-- 領域1. 電腦視覺(computer vision, CV)
-- 領域2. 自然語言處理(natural language procssing, NLP)
-- 領域3. 資料科學(data science, DS)
-- 其他領域：推薦系統(recommender system, RS)、智慧決策支援系統(intelligent decision support system, IDSS)
-- 發展強度：窄AI/弱AI(ANI)、通用AI/強AI(AGI)、超AI(ASI)
-    - 強AI程度：(由低至高) conversational < resoning < autmomous < innnovating < organizational AI
+- 資訊查詢與AI發展史
+    - 搜尋引擎：Google, Yahoo
+    - 語音轉文字(speech-to-text) + 搜尋引擎：Apple Siri (2007), Google Assistant, Amazon Alexa, MS Cortana
+    - 文字型聊天機器人(chatbot)
+    - 導入LLM的應用 + UX：ChatGPT (2022)
+        - OpenAI開發，2017年初次發布模型GPT (generative pre-trained transformer)，2022年提供ChatGPT服務，2024年GPT-4引入多模態。
+    - 歐盟於2024年頒布並實施人工智慧法案(AI Act)：強調AI應具備可解釋(explainable)、可負責(responsible)精神。
+    - 第一波AI熱潮1950年代，第二波1980年代發展出2大方向專家系統(expert system, ES)、類神經網絡(artificial neural network, ANN)。第三波興起於2010年代至今。
+
+- AI應用領域
+    - 領域1. 電腦視覺(computer vision, CV)
+    - 領域2. 自然語言處理(natural language procssing, NLP)
+    - 領域3. 資料科學(data science, DS)
+    - 其他領域：推薦系統(recommender system, RS)、智慧決策支援系統(intelligent decision support system, IDSS)
+    - 發展強度：窄AI/弱AI(ANI)、通用AI/強AI(AGI)、超AI(ASI)
+        - 強AI程度：(由低至高) conversational < resoning < autmomous < innnovating < organizational AI
+
+### 1-2. 部署本地端AI模型的好處
+1. 資料隱私與安全性
+    - 適合需要嚴格資安的產業，如金融業、國防、司法、醫療。
+    - 搭配組織內部資安政策，如MFA、資料加密、存取權限、防火牆。
+2. 網速與服務表現
+    - 降低傳輸延遲。
+    - 適合不須依賴網路連線的封閉內網，如飛機、軍事。
+3. 總擁有成本(total cost of ownership, TCO)
+    - 避免供應商鎖定(vendor lock-in)，可不綁定平台的資費方案(訂閱制、用量制)，亦能自選模型。
+    - 適合使用頻度高、運算程度高的使用情境，如客服機器人、程式碼生成、知識管理平台。
+4. 客制化開發
+    - 避免AI幻覺(AI hallucination)提升回應精確度，如調整temperature、top-k、top-p等參數，導入RAG架構，或微調模型。
+    - Ollama屬於輕量型平台，自選下載模型後自建本地端API使用，亦可搭配Python或JS自行開發AI工作流。
 
 ### 1-3. 優化LLM模型表現
 - 重新訓練
@@ -30,6 +50,7 @@
 - 微調
     - 概念：使用預訓練模型(pre-trained model)，進行微調(fine-tuneing)
     - 優勢：(1) 避免洩漏商業機密、(2) 避免系統受誤導、(3) 不受限於原有模型的特定價值避答機制、(4) 模型改動較小，但投入技術與成本仍高。
+    - 適用：專業術語多，知識邊界明確。
 - 模型輕量化
     - 概念：透過量化(quantization)、剪枝(pruning)、知識蒸餾(distallation)、二值化(binatization)等資訊技術，讓原碼參數量需求降低，提供一般PC可用的模型。
     - 優勢：(1) 降低算力負擔，無須另外購置AI PC設備(CPU+GPU or CPU+NPU)
@@ -38,6 +59,7 @@
     - 概念：由使用者限定資料範疇，強化情境相關資訊，再讓LLM找出解答、產生文字內容。
     - 優勢：(1) 無須資料清洗、(2) 根據預算可搭配微調、RAG技術之開發。
     - 案例：個人知識管理(personal knowledge management, PKM)。Deep Research 開發與應用 - OpenAI 或 Perplexity。
+    - 適合：企業內部知識管理，動態更新內容(即時財經資訊、客服最新消息)，涉及敏感資料(醫療、專利、軍事)
 - 思考鏈(chain-of-thought, CoT)
     - 概念：避免或改善AI幻覺
 - 評估 LLM 能力測試 (四大類項 - 英文、程式、數學、中文)
@@ -66,6 +88,7 @@
     | --- | --- | --- |
     | 實作方式 | 基於Open AI在Azure公有雲(Azure OpenAI, AOAI)，各自在雲端開立獨立空間，進行各自的微調訓練。 | 自行購置並架設高算力GPU的主機，以及使用本地足量記憶體，訓練及推論模型。免用 Ethernet (RJ-45) 或 WiFi (4G/LTE、5G)。 |
     | 優勢 | (1) 彈性擴增算力<br>(2) 模型儲存容量大<br>(3) 因應非開放原碼要求<br>(4) 初期建置成本較低 | (1) 不受制於外部網路品質<br>(2) 可自行管理資安防護<br>(3) 節省長期變動成本 |
+    | 劣勢 | 網路不穩會影響即時性效果 | 仰賴自身硬體設備規格(非企業級用戶70b模型幾乎是上限) |
 
 - 評估推論模型時的硬體需求【重要!】
     1. `RAM 位元組數 = 參數數量 × 每個參數的 bit 數 ÷ 8`
@@ -77,17 +100,23 @@
         - 利用率通常不高，GPU 30%-70%、NPU（手機）10%-40%、CPU 更低。
         - 每個參數在推論時，通常會用到「乘法 + 加法」各一次，矩陣乘法（matrix multiplication）`y_i = w1*x1 + w2*x2 + w3*x3 + ... + wN*xN`，故每個 token 所需運算量約 2 次運算。
         - 若載入比 7b 大的模型，建議安裝在工作站(work station)、伺服器(server)，串接多部伺服器執行。也可能用 40 TOPS 效能 AI PC 執行，表示在 8-bit 精度下每秒最多 40 兆次運算。
-    3. 檢查主機資源 (最低規格：Win10 以上 + RAM 16 GB + 硬碟空間 20 GB)
+    
+    3. 檢查主機資源 (最低規格：Win10 以上/macOS 11以上/Linux + RAM 16 GB + 硬碟空間 20 GB)
         - OS系統：設定 > 系統 > 系統資訊 > Windows 規格 > 版本
         - 記憶體：設定 > 系統 > 系統資訊 > 裝置規格 > RAM
         - 硬碟：本機 > 檢視 > 硬碟大小總計
         - GPU/高筱能運算的加速晶片：設置大量硬體乘加器(multiply accumulator, MAC)，捨棄原本 3D 繪圖需要的著色器(shader)
         - CUDA：由 NVIDIA 開發的軟體，用於搭配 GPU 加速開發 AI 模型
-
+ 
     4. 選定模型放置路徑 (合理配置 SSD 資源)
         - 預設路徑：`C:\Users\rjsiao\.ollama\model\blobs\*`
+            - `bolb\*` 儲放模型實際資料，分割的檔案(參數檔、模板設定、授權條款...)都以SHA256開頭
+            - `manifest\*` 存放模型描述檔，JSON格式，讓Ollama能正確從bolb檔案夾抓取模型
         - 變更路徑：設定 > 系統 > 系統資訊 > 進階系統設定 > 環境變數 > 新增變數 `OLLAMA_MODELS` (變數值是 `D:\MODELS`) > 重啟電腦 > 新 pull 取得的模型都改在新路徑。
-        - 以 .ollama 命名，在 Linux OS 此目錄 (directory) 會隱藏，但在 Windows OS 這個檔案夾 (folder) 不隱藏。其下一層的 models\blobs 存放一個模型檔、多個附屬檔。
+        - 變更設定：Ollama > Settings... > Model Location > Browse > 選取新路徑
+        - 搬移既有模型
+            - 原本：以 .ollama 命名，在 Linux OS 此目錄 (directory) 會隱藏，但在 Windows OS 這個檔案夾 (folder) 不隱藏。其下一層的 models\blobs 存放一個模型檔、多個附屬檔。
+            - 搬移後：把 `bolb\*`、`manifest\*` 都移動至新資料夾下方，如 `D:\MODELS`。
     5. 其他建議作法
         - 不建議以舊電腦執行模型，因為高階電腦才適合虛擬化
         - 不建議以舊電腦執行模型，因為舊電腦不適合
