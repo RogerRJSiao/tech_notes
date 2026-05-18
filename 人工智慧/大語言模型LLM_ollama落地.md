@@ -54,7 +54,7 @@ flowchart LR
 | 儲存對話狀態<br>`/save your_chat_session` | `/save chat_translator`| 儲存歷史對話紀錄，用於角色設定、延續上下文。 |
 | 載入歷史對話紀錄<br>`/load your_chat_session`<br>或 `ollama run your_chat_session` | `/load chat_translator` | 只將對話紀錄與原本模型組裝 |
 | 上載外部文件到模型<br>`ollama run model:version prompt < "file_path"` | `ollama run gemma3:1b "請點列以下文件內容的重點" < "C:\Users\rjsiao\abc.txt"` | 限文字檔 |
-||||
+| 測試模型速度<br>`ollama run --verbose model "prompt"` || 查看初次載入記憶體時間，包括載入 load -> 讀取 prompt eval -> 生成 eval |
 
 ### 2.4 建立客製化模型 - Modefile
 
@@ -109,3 +109,34 @@ flowchart LR
     ```
 
 ### 2.6 評估硬體需求
+- **模型大小**
+  | 模型格式 | 定義 | 優劣說明 |
+  | --- | --- | --- |
+  | 浮點數精度(FP) | 每個參數占用位元數(bit)。單精度 FP32 是每個參數占用 32 bit，扣除佔位符 1 bit、指數位 8 bit，有效位元 23 bit。半精度 FP16 佔位符 1 bit，指數位 5 bit，有效位元 10 bit。| 精度越高，推理結果越準確，但算力資源消耗大。目前主流是用 FP16，符合模型效能幾乎不減(-0.01%)，且運算加速顯著。 |
+  | 模型大小 | `參數數量 x 浮點數精度(bit) / 8 (bit)` | 模型容量越大，運算資源需求越大。 |
+  | 量化程度(Q) | 模型參數與中間層運算結果過程中，由浮點數高精度轉換成整數低精度的方式，Q8/Q4/Q2是把參數(權重)分別壓縮為8/4/2個bit，若加入偏移項Q8_0對稱量化(type 0)，則變成Q8_1非對稱量化(type 1)。二次量化_K (k-quart)是進一步再壓縮模型大小，Q4_K表示先壓縮成 4 bit，再二次壓縮成 6 bit。<br>`還原近似權重(w) = 壓縮後整數權重(q) x 縮放比率(block scale) + 偏移項(block min)`。量化後的參數多了縮放比率、偏移項。 | 用於壓縮模型大小，並降低載入記憶體需求容量，達到加速運算。<br>(1)多數採用「訓練後量化」把原本FP32或FP16的參數權重，分群「block」映射到一個整數範圍。壓縮率越大，誤差也愈大，Q4壓縮大於Q8。<br>(2)加入偏移項能提高近似精度，但也增加運算資源Q8_1，如。<br>(3)二次量化是把每 8 個「block」再併成一個 6 bit 的「super-block」，壓縮率越高會犧牲精度 _K_L < _K_M < _L_S。 |
+
+- **模型壓縮**
+  - 量化(quantization)
+  - 參數剪枝(parameter pruning)：將較不重要的參數剔除。
+    - 結構化剪枝：刪除權重時以層、行、列、區塊，提升運算速度效能，但預測效能可能大幅降低。
+    - 非結構化剪枝：刪除權重前先對參數重要性評分，再移除不重要的，可能產生稀疏矩陣(sparse matrix)不利運算加速，後續常要再微調(fine-tune)模型。
+  - 低秩近似(low-rank approximation)：將大矩陣拆成低維度，如奇異值分解(Singular Value Decomposition, SVD)，逼近給定的原始權重矩陣。
+  - 知識蒸餾(knowledge distillation)：用大模型訓練小模型，如DeepSeek 模型是拿 ChatGPT-4o 教師模型的「軟標籤」訓練出來。
+
+- 硬體載入語言模型機制
+  - Windows OS
+    1. 將模型參數全部載入到 RAM。 ==> 模型成功在 CPU (最小 4 core) 運行。
+    2. Ollama 動態分配模型資源到 VRAM。 ==> 模型全部或部分成功在 GPU 執行。
+    3. 回覆速度(eval rate)是每秒可生成多少 token，計量單位 tokens/sec。
+    4. 若模型是混和專家模型(mixture of experts, MoE)架構，只啟動部分參數行生成回答，故運行速度快。qwen3:30b 是每次生成回答只是參數 30b 的 3b 個。
+  - MacOS (統一記憶體架構 + M 晶片，適合大模型，但可能高溫降速)
+    1. 將模型參數全部載入到 RAM。 ==> 模型成功在 CPU 與 GPU 之間運行。
+
+  > model size = 量化後的估算值(GB)
+  > RAM > model size + OS + 暫存快取 + APP
+  > `RAM >= model size x 1.3`
+  > GPU VRAM > model size + 暫存快取 + 運算結果。表示充分運用 GPU 平行計算能力達 99% 的效能，CPU 不參與運算。
+  > GPU VRAM < model size + 暫存快取 + 運算結果。表示充分運用 GPU 平行計算能力，CPU 也參與運算。
+  > `GPU VRAM >= model size x 1.2`
+  > GPU 全力運轉速度 = CPU 全力運轉速度 x 3
