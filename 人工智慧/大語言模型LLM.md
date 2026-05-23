@@ -170,15 +170,16 @@
 
 - 模型種類
 
-    | 模型分類 | 說明 | 舉例 |
+    | 標籤與模型分類 | 說明 | 舉例 |
     | --- | --- | --- |
-    | 尋常類模型(無特定/All) | 衍生版的命名相似，可能來自原開發者、非官方開發者 | mistrallite (Ｍistral), zephyr (Ｍistral衍生), openhermes (Ｍistral衍生), mathstral (Ｍistral，數理), phi (MicroSoft), llama3-gradient (Meta), llama3-chatqa (Meta), tinyllama (Meta), gemma (Google), codegemma (Google), shieldgemma (Google), qwen (Alibaba), granite (IBM), deepseek (DeepSeek) |
-    | 嵌入模型(embeding model) | 實現RAG | granite-embedding (IBM) |
-    | 視覺輸入模型(vision) | bakllava (Ｍistral與LLaVA) | |
-    | 提供工具呼叫模型(tools) | 當尋常類模型被以工具型式呼叫。 | mistral (Ｍistral), qwen (Alibaba) |
+    | 尋常類模型<br>無特定 `All` | 衍生版的命名相似，可能來自原開發者、非官方開發者 | mistrallite (Ｍistral), zephyr (Ｍistral衍生), openhermes (Ｍistral衍生), mathstral (Ｍistral，數理), phi (MicroSoft), llama3-gradient (Meta), llama3-chatqa (Meta), tinyllama (Meta), gemma (Google), codegemma (Google), shieldgemma (Google), qwen (Alibaba), granite (IBM), deepseek (DeepSeek) |
+    | `embedding`<br>- 嵌入模型 | - 原理：將文本分詞轉成向量 (映射至一個向量空間)，再透過向量儲存語意資訊。<br>- 用途：實現 RAG (文件檢索、文章相似度匹配等)，減少 AI 幻覺。 | granite-embedding (IBM) |
+    | `vision`<br>- 視覺輸入模型 | - 原理：屬於多模態模型，用視覺編碼器接受圖像，再把這些圖像特徵映射到 LLM 語意空間，最後用跨模態注意力機制建立圖、文之間關係。 | bakllava (Ｍistral與LLaVA), llama3.2-vision、gemma3:4b 以上 |
+    | `tools`<br>- 提供工具呼叫模型 | - 原理：支持函式呼叫，對話流程分三階段，先判斷意圖，確定需要外部工具後會封裝對應的函式、參數到tool_calls，最後呼叫函式將結果回傳到模型或直接給使用者<br>- 用途：可達成 AI agent 的能力，先計畫後執行，模型能調用外部工具或函式。 | mistral (Ｍistral), qwen3 (Alibaba), llama3.1, gpt-oss |
+    | `thinking`<br>- 推理模型 | - 原理：先生成思維鏈才進行回答。即拆解複雜任務，逐步推理。<br> - 用途：避免 AI 幻覺，實踐思維鏈(chain-of-thought, CoT)，但小型推理模型不適合。| phi-reasoning, qwen3, gpt-oss |
 
-    - 混和專家模型(mixture of experts, MoE)：例Mistral、DeepSeek。
-    - 推論模型(resoning model)
+    - 混和專家模型(mixture of experts, MoE)：使用模型時只有啟動部分參數，運算速度加快。例 Llama4、Mistral、DeepSeek、qwen3:30b、qwen3:235b, gpt-oss。
+    - 推論模型(reasoning model)
     - 無碼模型(dolphin model)：不太需要 fine-tune、不太需要複雜 prompt，但比較容易產生敏感內容、幻覺。
 
 - 設定使用者介面/窗口
