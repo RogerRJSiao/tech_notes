@@ -40,6 +40,21 @@
 | Text Generation Web UI<br>(Oobabooga webUI) | https://github.com/oobabooga/text-generation-webui | 底層結合llama.cpp引擎、Transformers、ExLllama V2/V3，可直接加載GPTQ、GGUF等格式模型。<br>擴充外掛眾多。(如stablediffusion圖像生成) |
 | LocalAI | https://localai.io/ | 底層結合llama.cpp (文字生成)、whisper (語音轉文字)、stablediffusion (圖像生成)、bark (語音生成)等後端引擎，故適合多元功能模型。<br>Golang開發，直接支援macOS、Linux系統，另裝WSL2或Docker可用於Windows。 |
 
+- Docker 安裝與問題排除：https://github.com/RogerRJSiao/rpa/tree/main/n8n#readme
+
+- 外部工具與模型介接 (以 OpenWeb UI 為例)
+  - Google 搜尋引擎功能介接/啟用：需到「程式化搜尋引擎」(Google Programmable Search Engine) 取得
+    1. OpenWeb UI 的「Google PSE 引擎 ID」= 程式化搜尋引擎 > 總覽 > 基本 > 搜尋引擎 ID > 複製
+    2. OpenWeb UI 的「Google PSE API 金鑰」= 程式化搜尋引擎 > 總覽 > 程式輔助存取權 > 開始使用 > 取得金鑰 > YES > NEXT > SHOW KEY > 複製
+    3. 尚可設定搜尋地區、圖片搜尋、安全搜尋等。
+  - ChatGPT 串接 (閉源模型)：https://platform.openai.com/api-keys
+    - 需填入信用卡資訊
+    - 在 OpenWeb UI 匯入模型：管理員控制台 > 設定 > 連線 > 開啟 > 點擊齒輪 > 貼上 ChatGPT API key > 儲存
+    - 在 OpenWeb UI 開啟文字轉語音功能：設定 > 音訊 > OpenAI > 貼上 ChatGPT API key  
+  - Gemini 串接 (閉源模型)：Google AI for Developers https://aistudio.google.com/apikey
+    - 在 OpenWeb UI 匯入模型：管理員控制台 > 設定 > 連線 > 開啟 > 點擊"+" > 開啟直接連線 > 貼上網址與 Gemini API key > 儲存
+    - URL網址那格，要輸入 https://generativelanguage.googleapis.com/v1beta/openai/
+  
 ### 2.2 Ollama系統架構
 
 ```mermaid
@@ -147,6 +162,7 @@ flowchart LR
     ```
 
 ### 2.6 評估硬體需求
+
 - **模型大小**
   | 模型格式 | 定義 | 優劣說明 |
   | --- | --- | --- |
@@ -179,3 +195,17 @@ flowchart LR
   > GPU VRAM < model size + 暫存快取 + 運算結果。表示充分運用 GPU 平行計算能力，CPU 也參與運算。
   > `GPU VRAM >= model size x 1.2`
   > GPU 全力運轉速度 = CPU 全力運轉速度 x 3
+
+### 2.7 Ollama REST API
+  - Port 是 11434。(Leet)
+  - 開啟 CMD 使用 `curl http://localhost:11434` 指令對 URL 發出請求與傳輸資料
+  - 使用 py 腳本與 requests 套件傳送資料。(推薦!!)
+    - 在請求的 payload 加上 `"format": "json"`，要求模型回覆要以 JSON 格式回傳。
+    - 再把回傳資料以 json.loads() 轉成字典格式，再 pd.DataFrame() 轉換成 Dataframe 格式。
+
+### 2.8 建構 RAG 架構
+  - 方法 1. 將搜尋資料投入語言模型
+    - `pip install googlesearch-python`，對網頁搜尋結果爬蟲。(過短時間多次請求，將出現 HTTP-Eroor 429)
+  - 方法 2. 建立向量資料庫
+    - 使用 Embedding 模型，建立向量資料。參數 10b 以上模型較佳。
+    - 建立向量資料庫(匯入檔案 -> 分割文本 -> 建立嵌入模型、資料庫 -> 分批把文本資料嵌入向量資料庫)，用 `pip install pdfplumber langchain langchain_community lainchain_ollama`

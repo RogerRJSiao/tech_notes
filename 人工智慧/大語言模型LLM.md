@@ -189,6 +189,12 @@
     - 推論模型(reasoning model)
     - 無碼模型(dolphin model)：不太需要 fine-tune、不太需要複雜 prompt，但比較容易產生敏感內容、幻覺。
 
+    > `vision` 模型 與圖片格式、解析度過高問題
+    > 解析器：Ollama 以 jpeg 和 png 為主，其他格式應先轉檔再給模型讀取。
+    > 編碼器：可處理的像素大小有所不同。
+    >   - 過高解析度的圖片會被壓縮再行辨識，降低辨識效果。
+    >   - 有些模型用適應性視窗，裁切多份分別進行辨識再整合結果。如 Gemma3 用 896 x 896 px。
+
 - 設定使用者介面/窗口
     - CLI/CUI：開啟 CMD
     - 瀏覽器 (以 Chromium 開發) + 延伸程式：MS Edge 是內建的 (pre-intalled, build-in) + Page Assist 附加元件 (extention, plug-in, add-on)，兩者相容/兼容(compatibility)，並將語系改成繁體中文。
