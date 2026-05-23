@@ -124,8 +124,13 @@
         - 隨時留意硬體加速支援的相關設定，包括 LLM 軟體偵測硬體存在並使用，以及 NVIDIA GPU 最新支援設定
 
 ### 1-5. 軟體選擇-LLM模型
+- 模型格式
+    - GGUF：由 llama.cpp 團隊開發的格式，用於快速儲存張量資料，轉換不同的量化類型，屬於 Ollama 支援格式的二進位制檔案。
+    - safetensors：由 Hugging Face 開發的格式，用於模型訓練、微調階段。若要直接讓 Ollam 用上，可上Hugging Face 找別人已轉檔的 GGUF。
+
 - 模型來源：Hugging Face, GitHub, Ollama
-    - 檢查已下載模型與版本：`ollama -v`
+    - 檢查已下載模型與版本：`ollama -v`。
+    - 從 Hugging Face 直接下載模型 GGUF：`ollama pull hf.co/your-account/model-name-GGUF:quant`。
 - 開放模型、部分開放模型、專屬/封閉模型
     - Linux基金會提出模型開放框架(Model Openness Framework, MOF)：17個區塊可開放
         - 程式碼6：評估用程式碼、預處理程式碼、訓練程式碼、推論程式碼、模型架構、函式庫與工具
@@ -142,10 +147,12 @@
         - 部分開放模型 - DeeepSeek - DeepSeek
         - 封閉模型 - Grok - xAI
 
-- 適用繁體中文語言的模型
+- 適用台灣、繁體中文語言的模型
     - 提示詞要求請用中文回答。
     - 找尋名稱有chinese的模型。
-    - 找尋國科會TAIDE訓練模型。
+    - 找尋國科會TAIDE訓練模型。(Hugging Face，需先提出授權申請，取得 Read Token)
+    - 找尋Taigi台灣閩南語模型。(Hugging Face)
+    - 找尋聯發科推出的Breeze2模型。(Hugging Face)
     - 選擇Qwen模型。
 
 - 參數數量

@@ -80,6 +80,19 @@ flowchart LR
 | 測試模型速度<br>`ollama run --verbose model "prompt"` || 查看初次載入記憶體時間，包括載入 load -> 讀取 prompt eval -> 生成 eval |
 
 ### 2.4 建立客製化模型 - Modefile
+0. 如何將 safetensors 轉換成輕量的 GGUF？(可用 Google Colab 資源)
+    1. git clone 複製並安裝 llama.cpp 專案
+    2. 確認授權並輸入 HUGGINGFACE_TOKEN (需先到官網註冊 Hugging Face 帳號)
+    3. 下載 safetensors 模型
+    4. 用 convert_hf_to_gguf.py 轉檔成 GGUF 格式
+        - 使用 tokenizer.model 判斷採用哪類的 tokenizer，這是自然語言與 token ID 的對照關係，絕對不可欠缺。沒有 tokenizer.model 只有 tokenizer.json 的模型，需先執行 convert_hf_to_gguf_update.py。
+        - 不適用於多模態模型。
+    5. 用 CMake (C++) 把 GGUF 進行量化處理
+        - 輸入指定的量化格式，如 Q4_K_M
+    6. 下載量化完成的 GGUF 模型檔
+    7. 將下載好的 GGUF 檔案和 Modelfile 放在同一階資料夾內。
+        - Modelfile 第一列寫 `FROM ./taide-8b-Q4_K_M.gguf`。
+        - 由於 TAIDE 的基礎模型為 Llama3.1，沿用它的 Modelfile 格式。
 
 1. 撰寫自己的 Modefile (副檔名 = .txt/.py/.js)
     ```
@@ -99,7 +112,9 @@ flowchart LR
     MESSAGE assistant 可以的，請給我數據和資料。
     ```
 
-2. 用這份 ModeFile 建立新模型：`ollam create new_model_name -f "file_path"`
+2. 用這份 ModeFile 註冊新模型：`ollam create new_model_name -f "file_path"`。
+
+3. (可選) 刪除原本下載的模型 GGUF。(因為 Ollama 會複製一個新模型到系統資料夾)
 
 ### 2.5 啟用自訂環境變數
 - 方法 1. 直接修改 OS 系統或使用者的環境變數
