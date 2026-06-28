@@ -71,6 +71,32 @@ feature/B                     ●──●──●               (功能B開發
     - `hotfix` 是唯一可以跳過 `develop` 直接修 `main` 的情境。
 
 
+### GitHub Flow 協同開發-提取請求
+
+```
+main        ──●──────●──●────●──────●────●────  (PR審查→merge)
+               \    /    \    \    /    /
+hotfix          ●──●      \    ●──●    /        (修復)
+                           \          /
+feature/A                   ●──●──●──●          (新功能)
+```
+
+- 導入目的：合併程式到主分支經多重檢查，增加穩定性。增強團隊溝通與協同開發。支援測試與審查流程。
+- 與 Git Flow 差異：不建立 `develop`、`release` 分支；所有的新開分支皆直接源自 `main`，並且合併回到 `main`；適合持續部署（CD）的輕量協作。
+
+- Pull Request (PR) vs. Merge Request (MR)：同一功能，不同平台的名稱。GitHub / Bitbucket 稱 PR（強調請對方把變更 pull 進來）；GitLab 稱 MR（強調把分支 merge 進目標分支）。兩者的流程完全相同。
+
+- Pull Request 合併步驟：
+    1. 從 `main` 建立功能分支：`git checkout -b feature/xxx`
+    2. 開發完成後推送至遠端：`git push origin feature/xxx`
+    3. 在 GitHub 上開啟 Pull Request（選擇 base: `main` ← compare: `feature/xxx`）
+    4. 填寫 PR 標題與說明，指派 Reviewers
+    5. Reviewers 審查程式碼，留下評論或要求修改（Request changes）
+    6. 開發者依回饋修改並補推送 commit，PR 自動更新
+    7. 審查通過（Approve）後，點擊 **Merge pull request** 合併進 `main`
+    8. 合併後刪除功能分支（GitHub 上可直接點 Delete branch）
+
+
 | git 指令 | 說明 | 備註 |
 | -- | -- | -- |
 | 初始化本地儲存庫 | | |
