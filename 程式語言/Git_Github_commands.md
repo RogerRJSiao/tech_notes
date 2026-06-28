@@ -145,8 +145,13 @@ PR / MR 介面提供三種合併按鈕，對應不同的 git 策略：
 
 | git 指令 | 說明 | 備註 |
 | -- | -- | -- |
-| 初始化本地儲存庫 | | |
+| 初始化本地儲存庫、設定環境變數 | | |
 | `git init` | 產生 .git 檔案 | |
+| `git config --global user.name "Your-Name"` | 設定全域使用者名稱 | 寫入 `~/.gitconfig`，所有 repo 共用 |
+| `git config --global user.email "you@example.com"` | 設定全域使用者信箱 | commit 紀錄中顯示的 email |
+| `git config --local user.name "Your-Name"` | 設定單一 repo 使用者名稱 | 寫入 `.git/config`，僅對當前 repo 生效，優先於 global |
+| `git config --list` | 查看目前所有 config 設定值 | 加 `--global` 只看全域設定 |
+|||
 | 連結本地與雲端分支 | | |
 | `git clone https-url` | 複製完整副本到本機電腦 | 包括 commit 歷史紀錄、分支、repo 子目錄。|
 | `git pull origin main` (下方 1. + 2. + 3.) | 一步完成，抓取並合併當前分支對應的遠端分支 | 直接把遠端併入本地，無法中途檢查 |
@@ -203,8 +208,24 @@ PR / MR 介面提供三種合併按鈕，對應不同的 git 策略：
 
 
 
-| Windows PowerShell 指令 | 說明 | 備註 (Linux bash 等效指令) |
+| MS-DOS Windows PowerShell 指令 | 說明 | 備註 (Linux BASh 等效指令) |
 | -- | -- | -- |
-| `type file-name` | 顯示檔案內容 | 中文內文會產生亂碼 |
-| `copy file-name new-file-name` | 複製檔案 | `cp file-name new-file-name` |
+| `wsl` | 啟動 Windows 的 Linux 子系統 | 透過 MS Store 安裝 WSL2 之後 (微軟在 2017 年推出 WSL) |
+| `Set-Location \` 或 `cd \` | 切回根目錄 | `cd` 或 `cd ~` |
+| `cd D:\` | 切回指定目錄 | `cd dir-name` |
+| `clear` | 清除終端機文字訊息 | `clear` |
+| `dir` | 顯示當前目錄內含檔案 | `ls` |
+| `ls` 或 `ls -al` | 顯示當前目錄的檔案資訊 | `ls` |
+| `dir *.txt` | 指定當前目錄指定檔名的檔案資訊 | `ls *.txt` | 
+| `echo "your-texts" > file-name` | 建立文字檔案 | `touch` |
+| `type file-name` | 顯示文字檔案內容 | `cat file-name`（中文內文在 Windows 終端機可能產生亂碼） |
+| `move file-name new-file-path` | 移動檔案到新目錄 | `mv file-name new-file-path` |
+| `copy file-name new-file-path` | 複製檔案 | `cp file-name new-file-path` |
+| `ren file-name new-file-name` | 變更新檔名 | `mv file-name new-file-name` |
+| `del file-name` 或 `erase file-name` | 刪除檔案 | `rm file-name` |
+| `mkdir dir-name` | 建立新目錄 | `mkdir dir-name` |
+| `xcopy dir-name new-dir` | 複製目錄及下方的所有檔案 | `cp -r dir-name new-dir` |
+| `rmdir dir-name` | 刪除空目錄 | `rmdir dir-name` |
+| `Remove-Item -Path "dir-name" -Recurse -Force` | 強制刪除該目錄及下方的所有檔案 | `sudo rm -rf dir-name` |
 | `New-Item .gitignore` | 建立可忽略檔案的規則清單 | `touch .gitignore` | 
+| `git --version` | 查看 Git 版本 | |
