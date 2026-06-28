@@ -1,3 +1,30 @@
+# 閱讀筆記-軟體開發版本控制
+
+> - 資料來源：你的第一本Git與GitHub入門書：輕鬆實作本機與遠端儲存庫的版本控制 | 陳會安 | 博碩文化 2025-03
+> - 閱讀日期：2026-06
+> - 資料整理：蕭瑞展
+> - === 部分整理來自 個人的軟體開發的經驗 ====
+
+## 版本控制系統 (version control system)
+- 常見版控系統：Git、GitHub、SVN (subersion)、CVS (concurrent version system)、Mercurial。
+
+- 版控架構分類
+
+    | 架構 | 代表工具 | 儲存庫位置 | 運作方式 | 優點 | 缺點 |
+    |------|----------|-----------|---------|------|------|
+    | **集中式（CVCS）** | SVN、CVS | 單一中央伺服器 | 開發者 checkout 取得工作副本，commit 直接寫回中央伺服器 | 管理集中、權限控管簡單 | 中央伺服器故障即全體無法提交；需連線才能操作 |
+    | **分散式（DVCS）** | Git、Mercurial | 每位開發者皆有完整儲存庫 | 本機可獨立 commit，再 push/pull 與他人同步 | 離線可工作；本機有完整歷史；分支成本低 | 概念較複雜；初次學習曲線較陡 |
+
+    ```
+    集中式（CVCS）               分散式（DVCS）
+
+    [ 中央伺服器 ]                 [ 遠端 Remote ]
+    /    |    \                   /             \
+    Dev-A Dev-B Dev-C           [ Local-A ]     [ Local-B ]
+    ↕     ↕     ↕               Working Dir     Working Dir
+    直接commit到中央伺服器       Staging Area    Staging Area
+                                Local Repo      Local Repo
+    ```
 
 ### Git 版控流程、分支與合併
 
