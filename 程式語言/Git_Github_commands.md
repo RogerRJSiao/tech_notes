@@ -78,6 +78,16 @@ flowchart LR
 | `git branch -d branch-name` | 刪除本地分支 | 主要是刪除已併入main的分支，但不能刪除 main。|
 | `git branch -D branch-name` | 強制刪除本地分支 | 主要是刪除未併入main的分支。|
 | `git push origin --delete branch-name` | 刪除遠端分支 | 本地分支仍保留，需另外用 `git branch -d` 刪除。|
+| 標記版本（Tag） | | |
+| `git tag` | 列出所有本地 tag | |
+| `git tag v1.0.0` | 在當前 commit 建立輕量標籤（lightweight tag） | 只是一個指向 commit 的指標，不含額外資訊 |
+| `git tag -a v1.0.0 -m "release-msg"` | 建立附註標籤（annotated tag） | 含作者、日期、訊息，適合正式版本發布 |
+| `git tag -a v1.0.0 sha-1` | 在指定 commit 建立附註標籤 | 補標記歷史 commit |
+| `git show v1.0.0` | 查看指定 tag 的詳細資訊 | |
+| `git push origin v1.0.0` | 推送單一 tag 到遠端 | tag 預設不會隨 `git push` 一起推送 |
+| `git push origin --tags` | 推送所有本地 tag 到遠端 | |
+| `git tag -d v1.0.0` | 刪除本地 tag | |
+| `git push origin --delete v1.0.0` | 刪除遠端 tag | |
 
 
 
