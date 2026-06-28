@@ -42,6 +42,35 @@ flowchart LR
     - 常見語法：`#` 的後方放註解。`your-dir/*.log` 指定該層目錄的哪一類檔案要忽略。`!unignorable.log` 把指定檔案保留，不可忽略。
     - 建立後需執行 `git add .gitignore` 讓規則對所有協作者生效。
 
+### Git Flow 協同開發分支模型
+
+```
+             v1.0.0      v1.1.0            v1.2.0
+main        ──●──────●────●─────────────────●──     (正式版本)
+              .\    /     .                /.
+hotfix        . ●──●      . release  ●────● .       (→ main + develop)
+              .     \     .         /      \.
+develop     ──●──────●──●─●────────●────────●───    (整合開發)
+               \       /   \      
+feature/A       ●──●──●     \                       (功能A開發)
+                             \
+feature/B                     ●──●──●               (功能B開發)
+```
+
+| 分支 | 生命週期 | 用途 | 合併目標 |
+| -- | -- | -- | -- |
+| `main` | 永久 | 存放正式上線的穩定版本，每個節點對應一個版本號（tag） | — |
+| `develop` | 長期 | 整合所有功能的開發主線，反映下一版本的最新進度 | — |
+| `feature/xxx` | 短期 | 單一功能開發，完成後合併回 develop | `develop` |
+| `release/x.x` | 短期 | 從 develop 切出，只做測試與 bug 修正，不加新功能，完成後同時合併回 main 與 develop | `main` + `develop` |
+| `hotfix/xxx` | 緊急短期 | 從 main 切出，修復線上緊急問題，完成後同時合併回 main 與 develop | `main` + `develop` |
+
+- 核心原則：
+    - `main` 永遠是可部署的乾淨版本。
+    - 日常開發不直接動 `main`，而是透過 `develop` 匯集後再發布。
+    - `hotfix` 是唯一可以跳過 `develop` 直接修 `main` 的情境。
+
+
 | git 指令 | 說明 | 備註 |
 | -- | -- | -- |
 | 初始化本地儲存庫 | | |
@@ -74,7 +103,7 @@ flowchart LR
 | 合併分支與解衝突 | | |
 | `git checkout branch-name` | 切換到另一分支 | |
 | `git checkout -b branch-name` | 新增並切換到另一分支 | 從當前節點開始 |
-| `git marge branch-name -m "commit-msg"` | 把指定分支合併到當前分支 | 若出現衝突，要先逐列解決。 |
+| `git merge branch-name -m "commit-msg"` | 把指定分支合併到當前分支。若出現衝突，需逐列解決後再 `git add` + `git commit`。放棄合併：`git merge --abort`。 | 自動生成合併訊息： `git merge branch-name --no-edit`，格式為 `Merge branch 'xxx' into yyy`。 |
 | `git branch -d branch-name` | 刪除本地分支 | 主要是刪除已併入main的分支，但不能刪除 main。|
 | `git branch -D branch-name` | 強制刪除本地分支 | 主要是刪除未併入main的分支。|
 | `git push origin --delete branch-name` | 刪除遠端分支 | 本地分支仍保留，需另外用 `git branch -d` 刪除。|
