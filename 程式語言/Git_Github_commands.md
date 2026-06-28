@@ -1,6 +1,7 @@
 # 閱讀筆記-軟體開發版本控制
 
-> - 資料來源：你的第一本Git與GitHub入門書：輕鬆實作本機與遠端儲存庫的版本控制 | 陳會安 | 博碩文化 2025-03
+> - 資料來源 1：你的第一本Git與GitHub入門書：輕鬆實作本機與遠端儲存庫的版本控制 | 陳會安 | 博碩文化 2025-03
+> - 資料來源 2：新手也能學會的Git&GitHub教科書 | たにぐち まこと、許郁文 | 碁峰 2022-07
 > - 閱讀日期：2026-06
 > - 資料整理：蕭瑞展
 > - === 部分整理來自 個人的軟體開發的經驗 ====
@@ -25,6 +26,20 @@
     直接commit到中央伺服器       Staging Area    Staging Area
                                 Local Repo      Local Repo
     ```
+
+- 遠端儲存庫的服務與供應商
+    - GitHub (微軟)
+    - GitLab (微軟 SaaS)
+    - Bitbucket (Atlassian 也提供 Sourcetree, Trello, Jira, Confluence)
+    - Azure (微軟 Azure DevOps)
+    - Backlog (日本企業 Nulab)
+
+- 版本控制的工作流程
+    - Git Flow：依開發運維性質建立分支，如 feature/功能名、release/版本號、hotfix/作業名，不直接改動 main 分支。
+    - GitHub Flow：以 Pull Request 為核心，根據主題建立分支，不直接改動 main 分支。
+    - GitLab Flow：結合 Git Flow 與 GitHub Flow，加入環境分支（如 `staging`、`production`）概念，程式碼從 `main` 依序晉升到各環境分支，搭配 Merge Request 審查；適合需要多環境部署（開發→測試→正式）的團隊。
+    - trunc 模式
+    - Mainline 模式
 
 ### Git 版控流程、分支與合併
 
@@ -56,6 +71,7 @@ flowchart LR
     Staged -->|git restore --staged| Modified
     Staged -->|git reset --hard HEAD| Unmodified
     Modified -->|git reset --hard HEAD| Unmodified
+    Unmodified -->|git reset --soft HEAD~1| Staged
 ```
 
 - **Working Directory（工作目錄）**：本地實際編輯檔案的區域，檔案狀態為 Untracked (某檔案初次提交) 或 Modified (非初次提交)。
@@ -71,7 +87,7 @@ flowchart LR
 
 - .gitignore：告訴 git 哪些檔案或資料夾**不需要納入版控**，通常用於排除機敏資訊、暫存檔、編譯產物等。
     - 建立方式：（PowerShell）`New-Item .gitignore`。（Linux / Git Bash）`touch .gitignore`
-    - 常見語法：`#` 的後方放註解。`your-dir/*.log` 指定該層目錄的哪一類檔案要忽略。`!unignorable.log` 把指定檔案保留，不可忽略。
+    - 常見語法：`#` 的後方放註解。`your-dir/*.log` 指定該層目錄的哪一類檔案要忽略。`lpg???.txt` 指定字元數(?=1字元)檔名要忽略。`log[0-9].txt` 指定範圍字元檔名要忽略 。`!unignorable.log` 把指定檔案保留，不可忽略。
     - 建立後需執行 `git add .gitignore` 讓規則對所有協作者生效。
 
 ### Git Flow 協同開發分支模型
@@ -142,6 +158,54 @@ PR / MR 介面提供三種合併按鈕，對應不同的 git 策略：
 
 - Git 2.34+ 預設使用 **ORT 演算法**（取代舊版 recursive）執行上述合併，速度更快、複雜交叉歷史的衝突誤判更少，日常無需手動指定。
 
+- 把本機多筆 commit 合併為一筆（互動式 rebase）：
+    ```bash
+    git rebase -i HEAD~3    # 合併最近 3 筆，數字依需求調整
+    ```
+    編輯器開啟後，保留第一行 `pick`，其餘改為 `squash`（或縮寫 `s`），存檔後再編輯合併的 commit 訊息。
+    ```
+    pick a1b2c3 first commit
+    squash d4e5f6 second commit   # ← 改 pick 為 squash
+    squash g7h8i9 third commit    # ← 改 pick 為 squash
+    ```
+    | 情境 | 說明 |
+    | -- | -- |
+    | 本機未推送的 commit | 安全，直接使用 |
+    | 已推送到遠端 | 需補 `git push --force-with-lease`（比 `--force` 安全，遠端有新 commit 時會拒絕，避免覆蓋他人工作） |
+    | GitHub PR 介面 | 直接選 **Squash and merge**，不需手動 rebase |
+
+- `git rebase -i` 各指令說明：
+
+    | 指令 | 縮寫 | 用途 |
+    | -- | -- | -- |
+    | `pick` | `p` | 保留此 commit（預設） |
+    | `squash` | `s` | 合併進前一筆，合併 commit 訊息 |
+    | `fixup` | `f` | 合併進前一筆，**捨棄**此筆訊息 |
+    | `reword` | `r` | 保留 commit，但修改訊息 |
+    | `edit` | `e` | 暫停在此筆，可修改檔案內容後再 `git rebase --continue` |
+    | `drop` | `d` | 刪除此 commit |
+
+- Patch：將 commit 差異匯出為獨立檔案，適合無法直接 push/pull 的情境（網路隔離、跨 repo 移植、傳給不用 Git 的人）。
+
+    | | `git diff` + `patch` | `git format-patch` + `git am` |
+    | -- | -- | -- |
+    | 工具 | Unix 通用 `patch` 指令 | Git 原生指令 |
+    | 保留 commit 訊息 | 否，只有程式碼差異 | 是（作者、時間、訊息全保留） |
+    | 適用對象 | 任何文字檔，不限 Git 專案 | 僅限 Git repo |
+
+    ```bash
+    # 產生 patch（舊 → 新，HEAD^^ 是祖父、HEAD^ 是父）
+    git diff HEAD^^ HEAD^ > ../patch.diff
+    # 套用 patch
+    patch < ../patch.diff
+
+    # Git 原生：產生最近 3 筆 commit 的 patch 檔
+    git format-patch HEAD~3
+    # 套用
+    git am 0001-fix-something.patch
+    ```
+    > `git diff A B` 是 A → B 的變化，寫反成 `HEAD^ HEAD^^` 會得到反向 diff，套用時變成撤銷該筆變更。
+
 
 | git 指令 | 說明 | 備註 |
 | -- | -- | -- |
@@ -160,10 +224,12 @@ PR / MR 介面提供三種合併按鈕，對應不同的 git 策略：
 | `git push --set-upstream origin main` | 設定上游(雲端)分支為 origin/main，讓提取、推送指令簡化為 `git pull` 和 `git push`。 | |
 | 查詢推送遠端 repo 後狀態 | | |
 | `git log` | 取得目前已提交的歷程紀錄 | 若提交紀錄過長，將以查閱模式顯示，按下Q鍵能離開。<br>只取前五筆紀錄：`git log -5` |
+| `git log -all` | 檢視提交歷程 | |
 | `git log --oneline` | 取得目前已提交的歷程紀錄，以單行顯示 | |
 | `git log --oneline --graph` | 取得目前已提交的歷程紀錄，以路徑圖顯示 | | 
 | `git branch` | 顯示當前地端分支清單 | 列出中有*開頭，表示當前的分支 |
 | `git branch -r` | 顯示當前雲端分支清單 | 同時列出雲端、地端分支：`git branch -a` |
+| `git branch -m branch-name new-branch` | 重新命名分支名稱 | |
 | `git branch --merged` | 只顯示已併入分支 | |
 | 查詢推送遠端 repo 前狀態 | | |
 | `git ls-files -s` | 查詢所有被 git 追蹤的檔案，版本建立的唯一sha-1識別碼 | |
@@ -179,8 +245,14 @@ PR / MR 介面提供三種合併按鈕，對應不同的 git 策略：
 | `git restore --staged file-name` | 把指定檔案移出暫存區(unstaged)，但保留工作目錄的修改(modified)。 | 取代 `git reset file-name`；與 `git restore`（不加 `--staged`）搭配可分兩步撤銷 |
 | `git add file-name` | 把檔案加入暫存區 | 當前全數檔案都移入暫存區：`git add`。<br>只把已修改移入暫存區：`git add -u`。 |
 | `git commit -m "commit-msg"`| 提交 commit | 加入暫存並同時提交該檔：`git commit -am "commit-msg"` |
+| 暫時迴避已修改檔案 |||
+| `git stash save "temp" -u` | 讓修改的內容暫存到 stash ||
+| `git stash list` | 列出所有暫存的 stash | 顯示格式 `stash@{num}` |
+| `git stash apply stash@{num}` | 套用指定的暫存 stash | 套用最新的暫存 stash：`git stash apply`。後續直接提交可用：`git commit -am "commit-msg"` |
+| `git stash dro stash@{num}` | 刪除指定的暫存 stash | 刪除最新的暫存 stash：`git stash drop`。清除所有：`git stash clear`。|
 | 修正已提交 commit |||
-| `git commit --amend` | 異動最新一次提交的訊息。 | 若要補上檔案或調整檔案，可先 `git add other-files`，再執行這個指令即可補上其他檔案。 |
+| `git commit --amend` | 異動最新一次提交的訊息。限推送 git push 之前！ | 若要補上檔案或調整檔案，可先 `git add other-files`，再執行這個指令即可補上其他檔案。|
+| `git commit -a --amend --no-edit` | 利用 ammend 新增提交檔案 | --no-edit 將禁止編輯器啟動。 |
 | `git reset --soft sha-1` | 把 HEAD 移回指定 commit，**保留**暫存區與工作目錄的所有變更 | 適合「撤銷 commit 但保留修改，準備重新整理後再提交」 |
 | `git reset --hard sha-1` | 把 HEAD 移回指定 commit，**清除**暫存區與工作目錄的所有變更 | 無法復原，僅影響已追蹤檔案 |
 | `git reset --hard HEAD` | 捨棄所有暫存區與工作目錄的修改，還原到最近一次 commit 狀態 | 同時清除 Staged 與 Modified，無法復原；僅影響已追蹤檔案，Untracked 檔案不受影響 |
