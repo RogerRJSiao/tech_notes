@@ -25,6 +25,10 @@ flowchart LR
     Unmodified -->|git push| Remote
     Remote -->|git pull| Unmodified
     Remote -->|git fetch + merge| Unmodified
+    Modified -->|git restore| Unmodified
+    Staged -->|git restore --staged| Modified
+    Staged -->|git reset --hard HEAD| Unmodified
+    Modified -->|git reset --hard HEAD| Unmodified
 ```
 
 - **Working Directory（工作目錄）**：本地實際編輯檔案的區域，檔案狀態為 Untracked (某檔案初次提交) 或 Modified (非初次提交)。
@@ -33,7 +37,8 @@ flowchart LR
 
 - 開立分支目的：隔離開發工作。提高協同開發效率。管理不同版本。
 - 衝突發生時機：多人並行開發產生 2 個分支以上，若修改相同檔案或相同程式碼時。
-- HEAD 預設指向該分支的最新提交節點。
+- **HEAD** 指標是預設指向該分支的最新提交節點。
+    - **Detached HEAD**：當 HEAD 直接指向某個 commit（而非分支）時進入此狀態，通常發生於 `git checkout <sha-1>` 或 `git checkout <tag>`。此狀態下可瀏覽或實驗，但新建的 commit 不屬於任何分支，離開後將無法透過分支名稱找回。若需保留變更，應先建立新分支：`git checkout -b new-branch`。
 
 - **Bare Repository（裸儲存庫）**：不含工作目錄的純版本歷史儲存庫，僅存放 `.git` 內部的版控資料，無法直接編輯檔案。通常作為團隊共享的遠端中央儲存庫（如 GitHub），建立後所有成員只能透過 `git push` / `git pull` 與其交換版本，無法在裸儲存庫上直接修改檔案，確保版本歷史的一致性與安全性。
 
@@ -97,6 +102,20 @@ feature/A                   ●──●──●──●          (新功能)
     8. 合併後刪除功能分支（GitHub 上可直接點 Delete branch）
 
 
+
+### Git 合併策略 (Merge Strategy in Git)
+
+PR / MR 介面提供三種合併按鈕，對應不同的 git 策略：
+
+| PR / MR 操作 | 對應指令 | 說明 |
+| -- | -- | -- |
+| **Merge commit** | `git merge --no-ff branch-name` | 強制產生合併 commit，即使可 fast-forward 也保留分支合併節點。兩分支有分叉時，Git 自動採用 Three-way Merge：找到共同祖先（base），比對雙方與 base 的差異後整合。Git Flow 常用，可明確追蹤每次功能合併時間點。 |
+| **Squash and merge** | `git merge --squash branch-name` | 把功能分支所有 commit 壓縮成一筆後合併，不保留原始 commit 歷史。適合開發時 commit 零碎、合併進 `main` 只想留一筆乾淨紀錄。GitHub Flow 常用。 |
+| **Rebase and merge** | `git rebase main` | 把功能分支的 commit 逐一重置到 `main` 頂端，產生線性歷史紀錄，也不建立合併 commit。<br>注意！已推送的分支不應 rebase（會重寫歷史，影響其他協作者）。 |
+
+- Git 2.34+ 預設使用 **ORT 演算法**（取代舊版 recursive）執行上述合併，速度更快、複雜交叉歷史的衝突誤判更少，日常無需手動指定。
+
+
 | git 指令 | 說明 | 備註 |
 | -- | -- | -- |
 | 初始化本地儲存庫 | | |
@@ -115,21 +134,32 @@ feature/A                   ●──●──●──●          (新功能)
 | `git branch -r` | 顯示當前雲端分支清單 | 同時列出雲端、地端分支：`git branch -a` |
 | `git branch --merged` | 只顯示已併入分支 | |
 | 查詢推送遠端 repo 前狀態 | | |
-| `git ls-files` | 查詢所有被 git 追蹤的檔案 | |
+| `git ls-files -s` | 查詢所有被 git 追蹤的檔案，版本建立的唯一sha-1識別碼 | |
 | `git status` | 取得當前檔案狀態 | 包括 untracked、modified |
-| `git diff --staged` | 比對暫存區檔案中的變更 | |
-| `git diff` | 比對已修改檔案中的變更 | |
+| `git diff HEAD` | 比對工作目錄與暫存區相對於 HEAD 的所有差異 (staged + unstaged 全包) | 相當於 `git diff` + `git diff --cached` 的總和 |
+| `git diff --cached` | 比對暫存區與 HEAD 的差異 | `git diff --staged` 為同義詞 |
+| `git diff` | 比對工作目錄與暫存區的差異 (尚未 git add 的變更) | |
 | `git diff sha-former sha-later` | 比對兩次提交 | |
 | 異動檔案的修改後或提交前狀態 | | |
 | `git rm --cached file-name` | 把指定檔案移除追蹤 | |
 | `git reset file-name` | 把指定檔案移出暫存區，退回 untracked 或 modified 狀態。 | 當前全數檔案都移出暫存區：`git reset` |
-| `git reset --hard sha-1` | 回復指定的提交節點狀態 | |
+| `git restore file-name` | 捨棄工作目錄中的修改(modified)，將檔案還原到最近一次 commit 的狀態(unmodified)。 | Git 2.23+ 推薦用法，取代 `git checkout -- file-name`。全部還原：`git restore .` |
+| `git restore --staged file-name` | 把指定檔案移出暫存區(unstaged)，但保留工作目錄的修改(modified)。 | 取代 `git reset file-name`；與 `git restore`（不加 `--staged`）搭配可分兩步撤銷 |
 | `git add file-name` | 把檔案加入暫存區 | 當前全數檔案都移入暫存區：`git add`。<br>只把已修改移入暫存區：`git add -u`。 |
 | `git commit -m "commit-msg"`| 提交 commit | 加入暫存並同時提交該檔：`git commit -am "commit-msg"` |
+| 修正已提交 commit |||
+| `git commit --amend` | 異動最新一次提交的訊息。 | 若要補上檔案或調整檔案，可先 `git add other-files`，再執行這個指令即可補上其他檔案。 |
+| `git reset --soft sha-1` | 把 HEAD 移回指定 commit，**保留**暫存區與工作目錄的所有變更 | 適合「撤銷 commit 但保留修改，準備重新整理後再提交」 |
+| `git reset --hard sha-1` | 把 HEAD 移回指定 commit，**清除**暫存區與工作目錄的所有變更 | 無法復原，僅影響已追蹤檔案 |
+| `git reset --hard HEAD` | 捨棄所有暫存區與工作目錄的修改，還原到最近一次 commit 狀態 | 同時清除 Staged 與 Modified，無法復原；僅影響已追蹤檔案，Untracked 檔案不受影響 |
+| `git revert sha-1 --no-edit` | 建立一個新 commit 來反轉指定 commit 的變更，不開啟編輯器 | **不重寫歷史**，安全用於已推送的分支；`--no-edit` 沿用預設 revert 訊息。若有衝突，解衝突後 `git add file-name` 再 `git revert --continue` |
+| `git cherry-pick sha-1` | 把指定 commit 的變更套用到當前分支，產生一筆新 commit | 適合從其他分支摘取單一修正。連續範圍：`git cherry-pick sha-A..sha-B`。衝突時解決後 `git add file-name` 再下 `git cherry-pick --continue`，放棄：`git cherry-pick --abort` |
+
 | 合併分支與解衝突 | | |
 | `git checkout branch-name` | 切換到另一分支 | |
 | `git checkout -b branch-name` | 新增並切換到另一分支 | 從當前節點開始 |
 | `git merge branch-name -m "commit-msg"` | 把指定分支合併到當前分支。若出現衝突，需逐列解決後再 `git add` + `git commit`。放棄合併：`git merge --abort`。 | 自動生成合併訊息： `git merge branch-name --no-edit`，格式為 `Merge branch 'xxx' into yyy`。 |
+| `git rebase main` 或 `git rebase master` | 把當前分支重置到指定分支上。若出現衝突，需逐列解決後再 `git add` + `git commit`。 | 產生線性化的提交歷史紀錄。 |
 | `git branch -d branch-name` | 刪除本地分支 | 主要是刪除已併入main的分支，但不能刪除 main。|
 | `git branch -D branch-name` | 強制刪除本地分支 | 主要是刪除未併入main的分支。|
 | `git push origin --delete branch-name` | 刪除遠端分支 | 本地分支仍保留，需另外用 `git branch -d` 刪除。|
