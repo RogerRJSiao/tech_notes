@@ -206,6 +206,7 @@ PR / MR 介面提供三種合併按鈕，對應不同的 git 策略：
     ```
     > `git diff A B` 是 A → B 的變化，寫反成 `HEAD^ HEAD^^` 會得到反向 diff，套用時變成撤銷該筆變更。
 
+### 常用 git 指令一覽表
 
 | git 指令 | 說明 | 備註 |
 | -- | -- | -- |
@@ -258,7 +259,6 @@ PR / MR 介面提供三種合併按鈕，對應不同的 git 策略：
 | `git reset --hard HEAD` | 捨棄所有暫存區與工作目錄的修改，還原到最近一次 commit 狀態 | 同時清除 Staged 與 Modified，無法復原；僅影響已追蹤檔案，Untracked 檔案不受影響 |
 | `git revert sha-1 --no-edit` | 建立一個新 commit 來反轉指定 commit 的變更，不開啟編輯器 | **不重寫歷史**，安全用於已推送的分支；`--no-edit` 沿用預設 revert 訊息。若有衝突，解衝突後 `git add file-name` 再 `git revert --continue` |
 | `git cherry-pick sha-1` | 把指定 commit 的變更套用到當前分支，產生一筆新 commit | 適合從其他分支摘取單一修正。連續範圍：`git cherry-pick sha-A..sha-B`。衝突時解決後 `git add file-name` 再下 `git cherry-pick --continue`，放棄：`git cherry-pick --abort` |
-
 | 合併分支與解衝突 | | |
 | `git checkout branch-name` | 切換到另一分支 | |
 | `git checkout -b branch-name` | 新增並切換到另一分支 | 從當前節點開始 |
@@ -278,7 +278,7 @@ PR / MR 介面提供三種合併按鈕，對應不同的 git 策略：
 | `git tag -d v1.0.0` | 刪除本地 tag | |
 | `git push origin --delete v1.0.0` | 刪除遠端 tag | |
 
-
+### 常用 OS 指令一覽表
 
 | MS-DOS Windows PowerShell 指令 | 說明 | 備註 (Linux BASh 等效指令) |
 | -- | -- | -- |
