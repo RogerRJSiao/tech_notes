@@ -3,11 +3,28 @@
 
 ```mermaid
 flowchart LR
+    subgraph WD["工作目錄<br>Working Directory"]
+        Untracked
+        Modified
+    end
+    subgraph SA["暫存區<br>Staging Area"]
+        Staged
+    end
+    subgraph LocalRepo["本機儲存庫<br>Local Repository"]
+        Unmodified
+    end
+    subgraph RemoteRepo["遠端儲存庫<br>Remote Repository"]
+        Remote
+    end
+
     Untracked -->|git add| Staged
-    Unmodified -->|edit file| Modified
     Modified -->|git add| Staged
     Staged -->|git commit| Unmodified
+    Unmodified -->|edit file| Modified
     Unmodified -->|git rm| Untracked
+    Unmodified -->|git push| Remote
+    Remote -->|git pull| Unmodified
+    Remote -->|git fetch + merge| Unmodified
 ```
 
 - **Working Directory（工作目錄）**：本地實際編輯檔案的區域，檔案狀態為 Untracked (某檔案初次提交) 或 Modified (非初次提交)。
@@ -38,8 +55,9 @@ flowchart LR
 | 查詢推送遠端 repo 後狀態 | | |
 | `git log` | 取得目前已提交的歷程紀錄 | 若提交紀錄過長，將以查閱模式顯示，按下Q鍵能離開。<br>只取前五筆紀錄：`git log -5` |
 | `git log --oneline` | 取得目前已提交的歷程紀錄，以單行顯示 | |
-| `git log --oneline --graph` | 取得目前已提交的歷程紀錄，以路徑圖顯示 | |
+| `git log --oneline --graph` | 取得目前已提交的歷程紀錄，以路徑圖顯示 | | 
 | `git branch` | 顯示當前地端分支清單 | 列出中有*開頭，表示當前的分支 |
+| `git branch -r` | 顯示當前雲端分支清單 | 同時列出雲端、地端分支：`git branch -a` |
 | `git branch --merged` | 只顯示已併入分支 | |
 | 查詢推送遠端 repo 前狀態 | | |
 | `git ls-files` | 查詢所有被 git 追蹤的檔案 | |
@@ -59,6 +77,8 @@ flowchart LR
 | `git marge branch-name -m "commit-msg"` | 把指定分支合併到當前分支 | 若出現衝突，要先逐列解決。 |
 | `git branch -d branch-name` | 刪除本地分支 | 主要是刪除已併入main的分支，但不能刪除 main。|
 | `git branch -D branch-name` | 強制刪除本地分支 | 主要是刪除未併入main的分支。|
+| `git push origin --delete branch-name` | 刪除遠端分支 | 本地分支仍保留，需另外用 `git branch -d` 刪除。|
+
 
 
 | Windows PowerShell 指令 | 說明 | 備註 (Linux bash 等效指令) |
