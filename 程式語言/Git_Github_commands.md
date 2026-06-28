@@ -18,10 +18,23 @@ flowchart LR
 - 衝突發生時機：多人並行開發產生 2 個分支以上，若修改相同檔案或相同程式碼時。
 - HEAD 預設指向該分支的最新提交節點。
 
+- **Bare Repository（裸儲存庫）**：不含工作目錄的純版本歷史儲存庫，僅存放 `.git` 內部的版控資料，無法直接編輯檔案。通常作為團隊共享的遠端中央儲存庫（如 GitHub），建立後所有成員只能透過 `git push` / `git pull` 與其交換版本，無法在裸儲存庫上直接修改檔案，確保版本歷史的一致性與安全性。
+
+- .gitignore：告訴 git 哪些檔案或資料夾**不需要納入版控**，通常用於排除機敏資訊、暫存檔、編譯產物等。
+    - 建立方式：（PowerShell）`New-Item .gitignore`。（Linux / Git Bash）`touch .gitignore`
+    - 常見語法：`#` 的後方放註解。`your-dir/*.log` 指定該層目錄的哪一類檔案要忽略。`!unignorable.log` 把指定檔案保留，不可忽略。
+    - 建立後需執行 `git add .gitignore` 讓規則對所有協作者生效。
+
 | git 指令 | 說明 | 備註 |
 | -- | -- | -- |
 | 初始化本地儲存庫 | | |
 | `git init` | 產生 .git 檔案 | |
+| 連結本地與雲端分支 | | |
+| `git clone https-url` | 複製完整副本到本機電腦 | 包括 commit 歷史紀錄、分支、repo 子目錄。|
+| `git pull origin main` (下方 1. + 2. + 3.) | 一步完成，抓取並合併當前分支對應的遠端分支 | 直接把遠端併入本地，無法中途檢查 |
+| 1. `git fetch origin` | 下載更新，但不會自動合併 | origin 是遠端儲存庫 |
+| 2. `git diff origin/main` | 比對當前的 (通常是 main) 與遠端 main 分支差異。若差異沒問題，可用 3. `git merge origin/main` 將遠端變更併入到本機 (通常是 main)。 | origin 是遠端儲存庫 |
+| `git push --set-upstream origin main` | 設定上游(雲端)分支為 origin/main，讓提取、推送指令簡化為 `git pull` 和 `git push`。 | |
 | 查詢推送遠端 repo 後狀態 | | |
 | `git log` | 取得目前已提交的歷程紀錄 | 若提交紀錄過長，將以查閱模式顯示，按下Q鍵能離開。<br>只取前五筆紀錄：`git log -5` |
 | `git log --oneline` | 取得目前已提交的歷程紀錄，以單行顯示 | |
@@ -52,3 +65,4 @@ flowchart LR
 | -- | -- | -- |
 | `type file-name` | 顯示檔案內容 | 中文內文會產生亂碼 |
 | `copy file-name new-file-name` | 複製檔案 | `cp file-name new-file-name` |
+| `New-Item .gitignore` | 建立可忽略檔案的規則清單 | `touch .gitignore` | 
