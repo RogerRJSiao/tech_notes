@@ -188,3 +188,14 @@
          - 凝聚式(agglomerative)：用凝聚方法，由樹狀圖底部向上逐次合併。
          - 分裂式(divisible)：用分裂方法，由樹狀圖頂部向下逐次分群。
          > 計算不同分群的距離方式：單一連接法(取距離max)，完全連接法(取距離min)，中心點連接法(取中心一點)，平均連接法(取所有點距離的平均)，
+
+### 強化學習 (reinforcement learning)
+- 代理人模仿人的行為(action, a)，與環境發生交互作用、依狀態(status, s)自行決定行動；環境則根據定義給予正向或負向獎勵(reward, r)，讓代理人可以更新演算法。整個過程屬於試誤學習。
+- 案例：Game AI，如 2016 年的 Alpha Go、2017 年的 Alpha Go Zero。
+- 缺點：如領域專家一樣，無法跨領域學習。
+- 必須：用程式語言和深度學習套件，如 Java 搭配 Deeplearning4j，Python 搭配 TensorFlow、Keras、MXNet、Pytorch。實作方向可針對木棒台車問題、太空侵略者。
+
+> **Q-learning 演算法** <br>
+> 記憶矩陣 W'(a,s) = W(a,s) + v(s')<br>
+> Q-table 是根據 a 和 s (狀態-行動)建立對應的表<br>
+> 步驟：0.定義狀態和獎勵。1.初始化Q表(全0矩陣)。2.選擇一個行動，並且執行。3.用馬可夫鏈(Markov chain)衡量獎勵值，再透過貝爾曼方程式(Bellman equation)更新Q表。4.重複2/3步驟，直到訓練結束。5.取得Q*表。<br>
